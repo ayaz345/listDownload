@@ -71,7 +71,7 @@ def urlListInit():
         try:
             argvListParse = ArgListParse(subList)
         except Exception as e:
-            print("Oops!", str(e), "occurred.")
+            print("Oops!", e, "occurred.")
             helpMan()
 
         # Estraggo i parametri funzionali
@@ -80,21 +80,15 @@ def urlListInit():
         if argvListParse.quite is not None:
             quite = argvListParse.quite
 
-        # Using readlines()
-        file1 = open(fileList, 'r')
-        Lines = file1.readlines()
-        file1.close()
-
-        list_of_lists = []
-        for line in Lines:
-            list_of_lists.append(shlex.split(line))
-
+        with open(fileList, 'r') as file1:
+            Lines = file1.readlines()
+        list_of_lists = [shlex.split(line) for line in Lines]
         argvParseFile = 0
         for line in list_of_lists:
             try:
                 argvParseFile = ArgParse(line, argvListParse.outDir)
             except Exception as e:
-                print("Oops!", str(e), "occurred.")
+                print("Oops!", e, "occurred.")
                 print(line)
                 helpMan()
 
@@ -110,7 +104,7 @@ def urlListInit():
             terminalArgv = sys.argv[1:]
             argvParseTerminal = ArgParse(terminalArgv, defaultDownloadPath)
         except Exception as e:
-            print("Oops!", str(e), "occurred.")
+            print("Oops!", e, "occurred.")
             helpMan()
 
         # Estraggo i parametri funzionali
@@ -148,18 +142,16 @@ def thread_function(dataList):
     print("\nDownload: " + url + "\n\t Start " + name)
     if platform.system() == "Linux":
         if quite:
-            cmd = "wget " + url + " --directory-prefix=\"" + savePath + "\"" + " --quiet"
-            # print(cmd)
-            os.system(cmd)
+            cmd = f"wget {url}" + " --directory-prefix=\"" + savePath + "\"" + " --quiet"
         else:
             cmd = "xterm -e bash -c '" + "wget " + url + " --directory-prefix=\"" + savePath + "\"" + "'"
-            # print(cmd)
-            os.system(cmd)
+        # print(cmd)
+        os.system(cmd)
     elif platform.system() == "Windows":
-        fileName = savePath + "/" + name
-        cmd = "Invoke-WebRequest -Uri " + url + " -OutFile \"" + fileName + "\""
+        fileName = f"{savePath}/{name}"
+        cmd = f"Invoke-WebRequest -Uri {url}" + " -OutFile \"" + fileName + "\""
         # print("powershell.exe " + cmd)
-        os.system("powershell.exe " + cmd)
+        os.system(f"powershell.exe {cmd}")
     else:
         print("OS not Supported")
     print("\n\t END " + name)
@@ -172,8 +164,10 @@ def thread_function(dataList):
 def main():
     urlListInit()
 
-    print("The download start with " + str(pDW) + " parallel Connection")
-    print("Output quiet = " + str(quite) + " My Current Work Directory is: " + os.getcwd())
+    print(f"The download start with {str(pDW)} parallel Connection")
+    print(
+        f"Output quiet = {str(quite)} My Current Work Directory is: {os.getcwd()}"
+    )
 
     # Start parallel procedure
     start_time = datetime.now()
@@ -194,9 +188,9 @@ def main():
 
     time_elapsed = datetime.now() - start_time
     print("## Downloads end ##")
-    print('Total Time (hh:mm:ss.ms) {}'.format(time_elapsed))
-    print('Mean Time General(hh:mm:ss.ms) {}'.format(time_elapsed / nDownload))
-    print('Mean Time x File (hh:mm:ss.ms) {}'.format(time_elapsed * pDW / nDownload))
+    print(f'Total Time (hh:mm:ss.ms) {time_elapsed}')
+    print(f'Mean Time General(hh:mm:ss.ms) {time_elapsed / nDownload}')
+    print(f'Mean Time x File (hh:mm:ss.ms) {time_elapsed * pDW / nDownload}')
 
 
 if __name__ == '__main__':
