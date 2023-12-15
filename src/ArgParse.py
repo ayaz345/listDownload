@@ -42,22 +42,21 @@ class Parser:
         """
         op = argList[0]
 
-        if op == "#" or op == "//":     # comment detect and avoiding
+        if op in ["#", "//"]:     # comment detect and avoiding
             return []   # Empty list
 
-        if op == "-p" or op == "--parallelDownload":
+        if op in ["-p", "--parallelDownload"]:
             val = argList[1]
-            if val.isnumeric():
-                self.pDW = int(val)
-                return argList[2:]
-            else:
+            if not val.isnumeric():
                 raise Exception("parallelDownload parameter are Incorrect")
 
-        elif op == "-o" or op == "--outSave":
+            self.pDW = int(val)
+            return argList[2:]
+        elif op in ["-o", "--outSave"]:
             self.outDir = argList[1]
             return argList[2:]
 
-        elif op == "-d" or op == "--digit ":
+        elif op in ["-d", "--digit "]:
             val = argList[1]
             if val.isnumeric():
                 self.digit = int(val)
@@ -65,10 +64,10 @@ class Parser:
             else:
                 raise Exception("digit parameter are Incorrect")
 
-        elif op == "-q" or op == "--quiet":
+        elif op in ["-q", "--quiet"]:
             self.quite = True
             return argList[1:]
-        elif op == "-v" or op == "--verbose":
+        elif op in ["-v", "--verbose"]:
             self.quite = False
             return argList[1:]
 
@@ -85,14 +84,13 @@ class Parser:
         self.baseUrl = str(argv[0])
         self.endUrl = str(argv[1])
 
-        if argv[2].isnumeric() and argv[3].isnumeric():
-            self.startNum = int(argv[2])
-            self.endNum = int(argv[3])
-            if self.endNum < self.startNum:
-                raise Exception("The Order of the Number are wrong, please change the order")
-        else:
+        if not argv[2].isnumeric() or not argv[3].isnumeric():
             raise Exception("The Number of the index aren't number!! please use the correct sintax")
 
+        self.startNum = int(argv[2])
+        self.endNum = int(argv[3])
+        if self.endNum < self.startNum:
+            raise Exception("The Order of the Number are wrong, please change the order")
         argList = argv[4:]      # get the variable side of the string
         self.listArgvParse(argList)
 
